@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kyle Hub</title>
+<meta name="description" content="Kyle Hub: The ultimate hub for the best Roblox scripts, powerful GUIs, and game utilities.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23e11d2e'/%3E%3Ctext x='50' y='70' font-size='62' font-family='Arial Black' text-anchor='middle' fill='white'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Cairo:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ Tokens ============ */
+:root{
+  --bg:#050505; --bg2:#0e0e10; --card:#141416; --card2:#1b1b1e; --line:#2b2b30;
+  --text:#f6f3f3; --muted:#a3a0a4;
+  --red:#ff2d3f; --red2:#b3121f; --red-ink:#fff; --glow:rgba(255,45,63,.35);
+  --code-bg:#0a0a0b; --code-ink:#f5c9cd;
+  --wm-face:#ffffff; --wm-ext:#e11d2e;
+  --shadow:0 10px 30px rgba(0,0,0,.5);
+  --font-body:'Outfit','Cairo',system-ui,sans-serif;
+  --font-display:'Bungee','Cairo',system-ui,sans-serif;
+  --font-code:'JetBrains Mono',ui-monospace,Consolas,monospace;
+  --hdr:64px;
+}
+[data-theme="light"]{
+  --bg:#ffffff; --bg2:#fff3f3; --card:#ffffff; --card2:#fff0f0; --line:#f1cfd2;
+  --text:#1c0b0d; --muted:#6f5558;
+  --red:#d90429; --red2:#8d021a; --red-ink:#fff; --glow:rgba(217,4,41,.22);
+  --code-bg:#fff6f6; --code-ink:#7a0a1a;
+  --wm-face:#e3122d; --wm-ext:#7a0012;
+  --shadow:0 10px 30px rgba(140,20,35,.14);
+}
+[dir="rtl"]{--font-body:'Cairo','Outfit',system-ui,sans-serif}
+
+/* ============ Base ============ */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.55;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+h1,h2,h3{line-height:1.15;margin:0}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+svg{flex:none}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Wordmark: extruded block letters */
+.wm{font-family:var(--font-display);color:var(--wm-face);letter-spacing:.02em;white-space:nowrap;
+  text-shadow:1px 1px 0 var(--wm-ext),2px 2px 0 var(--wm-ext),3px 3px 0 var(--wm-ext),4px 4px 0 var(--wm-ext),5px 5px 0 var(--wm-ext),6px 6px 0 var(--wm-ext),7px 7px 0 var(--wm-ext),8px 8px 0 var(--wm-ext),12px 14px 34px var(--glow)}
+.wm.sm{font-size:1.45rem;text-shadow:1px 1px 0 var(--wm-ext),2px 2px 0 var(--wm-ext),3px 3px 0 var(--wm-ext),4px 4px 0 var(--wm-ext)}
+.wm.xl{font-size:clamp(3.1rem,14.5vw,9.5rem);line-height:.95;animation:drop .7s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes drop{from{opacity:0;transform:translateY(-24px) scale(.96)}to{opacity:1;transform:none}}
+[dir="rtl"] .wm{direction:ltr}
+
+/* ============ Header ============ */
+.hdr{position:sticky;top:0;z-index:40;height:var(--hdr);display:flex;align-items:center;gap:.6rem;padding:0 1rem;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:2px solid var(--red)}
+.hdr .sp{flex:1}
+.icon-btn{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--card);transition:border-color .15s,background .15s}
+.icon-btn:hover{border-color:var(--red)}
+.icon-btn.txt{width:auto;padding:0 .7rem;gap:.4rem;display:inline-flex;align-items:center;font-weight:600;font-size:.9rem}
+.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:var(--red);color:var(--red-ink);display:inline-grid;place-items:center;font-weight:700;flex:none}
+.avatar.sm{width:24px;height:24px;font-size:.75rem}
+.avatar.xl{width:112px;height:112px;font-size:2.6rem;border:3px solid var(--red)}
+
+/* ============ Sidebar ============ */
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.backdrop.show{opacity:1;pointer-events:auto}
+.sidebar{position:fixed;inset-block:0;inset-inline-start:0;width:min(310px,86vw);z-index:60;background:var(--bg2);border-inline-end:2px solid var(--red);display:flex;flex-direction:column;padding:1rem;transform:translateX(-104%);transition:transform .25s ease}
+[dir="rtl"] .sidebar{transform:translateX(104%)}
+.sidebar.open,[dir="rtl"] .sidebar.open{transform:none}
+.sb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.nav{display:flex;flex-direction:column;gap:.35rem;flex:1}
+.nav a{display:flex;align-items:center;gap:.8rem;padding:.8rem .9rem;border-radius:10px;font-weight:600;border:1px solid transparent}
+.nav a:hover{background:var(--card2)}
+.nav a.active{background:var(--red);color:var(--red-ink)}
+.discord{display:flex;align-items:center;justify-content:center;gap:.7rem;padding:1rem;border-radius:12px;background:#5865f2;color:#fff;font-weight:700;font-size:1.05rem;box-shadow:0 8px 24px rgba(88,101,242,.4);transition:transform .15s,filter .15s}
+.discord:hover{transform:translateY(-2px);filter:brightness(1.08)}
+
+/* ============ Layout ============ */
+main{flex:1;width:100%;max-width:1240px;margin:0 auto;padding:1.25rem 1rem 3rem}
+.footer{padding:1.5rem 1rem;text-align:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:0.5rem}
+
+/* Hero */
+.hero{position:relative;text-align:center;padding:clamp(2rem,7vw,4.5rem) 1rem clamp(1.5rem,4vw,2.5rem);isolation:isolate;overflow:hidden;border-radius:20px;margin-bottom:1.5rem;border:1px solid var(--line);background:var(--bg2)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 78%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 78%);opacity:.8}
+.hero::after{content:"";position:absolute;inset:auto -10% -55% -10%;height:80%;z-index:-1;background:radial-gradient(ellipse at center,var(--glow),transparent 65%)}
+.hero .tag{font-size:clamp(1.05rem,2.6vw,1.4rem);color:var(--muted);max-width:34ch;margin:1.5rem auto 1.5rem}
+.hero-cta{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center}
+.stats{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem;color:var(--muted);font-size:.95rem}
+.stats b{color:var(--text)}
+
+.page-h{display:flex;align-items:center;gap:.75rem;margin:.5rem 0 .25rem}
+.page-h h2{font-family:var(--font-display);font-size:clamp(1.6rem,5vw,2.3rem);font-weight:400}
+[dir="rtl"] .page-h h2{font-family:var(--font-body);font-weight:800}
+.page-h svg{color:var(--red);width:30px;height:30px}
+.sub{color:var(--muted);margin:0 0 1.25rem}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.65rem 1.1rem;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:600;transition:transform .12s,border-color .15s,background .15s}
+.btn:hover{border-color:var(--red)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--red);border-color:var(--red);color:var(--red-ink);box-shadow:0 6px 20px var(--glow)}
+.btn.primary:hover{background:var(--red2);border-color:var(--red2)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--red)}
+.btn.danger:hover{background:var(--red);color:var(--red-ink)}
+.btn.lg{padding:.85rem 1.6rem;font-size:1.05rem}
+.btn.block{width:100%}
+.btn.sm{padding:.4rem .7rem;font-size:.85rem}
+.btn[disabled]{opacity:.55;pointer-events:none}
+.link{background:none;border:0;color:var(--red);font-weight:700;padding:0}
+
+/* Toolbar */
+.toolbar{display:flex;gap:.75rem;margin:1rem 0 1.25rem;flex-wrap:wrap}
+.search{flex:1;min-width:220px;display:flex;align-items:center;gap:.6rem;padding:0 .9rem;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+.search:focus-within{border-color:var(--red);box-shadow:0 0 0 3px var(--glow)}
+.search input{flex:1;border:0;outline:0;background:none;height:100%;min-width:0}
+.search svg{color:var(--muted)}
+.seg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:none;width:46px;height:44px;display:grid;place-items:center;color:var(--muted)}
+.seg button.on{background:var(--red);color:var(--red-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:.4rem .95rem;font-weight:600;font-size:.92rem}
+.chip:hover{border-color:var(--red)}
+.chip.on{background:var(--red);border-color:var(--red);color:var(--red-ink)}
+.chip small{opacity:.75;margin-inline-start:.35rem}
+
+/* Cards */
+.results.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:1.1rem}
+.results.list{display:flex;flex-direction:column;gap:1rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s}
+.card:hover{border-color:var(--red);box-shadow:0 0 0 1px var(--red),var(--shadow)}
+.thumb{position:relative;aspect-ratio:16/9;background:var(--card2);cursor:pointer;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-ph{width:100%;height:100%;display:grid;place-items:center;color:var(--red);background:repeating-linear-gradient(135deg,var(--card2) 0 14px,var(--card) 14px 28px)}
+.thumb-ph svg{width:44px;height:44px}
+.badge{position:absolute;top:.6rem;inset-inline-start:.6rem;background:var(--red);color:var(--red-ink);font-weight:700;font-size:.8rem;padding:.2rem .65rem;border-radius:6px}
+.card-body{padding:1rem;display:flex;flex-direction:column;gap:.6rem;flex:1;min-width:0}
+.card h3{font-size:1.2rem;cursor:pointer;overflow-wrap:anywhere}
+.card h3:hover{color:var(--red)}
+.meta{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.85rem;flex-wrap:wrap}
+.meta .who{display:inline-flex;align-items:center;gap:.4rem;font-weight:600;color:var(--text)}
+.desc{margin:0;color:var(--muted);font-size:.93rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem}
+.tag-pill{font-size:.75rem;padding:.1rem .55rem;border-radius:6px;background:var(--card2);border:1px solid var(--line);color:var(--muted)}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);font-family:var(--font-code);font-size:.8rem;line-height:1.5;padding:.8rem 1rem;border-radius:10px;border:1px solid var(--line);border-inline-start:3px solid var(--red);overflow:auto;direction:ltr;text-align:left;tab-size:2}
+pre.code.prev{max-height:8.2rem;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(#000 65%,transparent);mask-image:linear-gradient(#000 65%,transparent)}
+pre.code.full{max-height:50vh}
+.card-actions{display:flex;gap:.5rem;margin-top:auto;padding-top:.3rem}
+.card-actions .btn{flex:1}
+.card-actions .btn.icon{flex:none}
+.results.list .card{flex-direction:row}
+.results.list .thumb{width:250px;aspect-ratio:auto;min-height:100%;flex:none}
+@media (max-width:700px){.results.list .card{flex-direction:column}.results.list .thumb{width:100%;aspect-ratio:16/9}}
+
+.empty{grid-column:1/-1;text-align:center;padding:3rem 1rem;border:2px dashed var(--line);border-radius:16px;color:var(--muted)}
+.empty svg{width:40px;height:40px;color:var(--red);margin-bottom:.5rem}
+.skel{height:300px;border-radius:14px;background:linear-gradient(100deg,var(--card) 30%,var(--card2) 50%,var(--card) 70%);background-size:200% 100%;animation:sh 1.2s infinite linear}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* Panels & forms */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.25rem}
+.panel.narrow{max-width:620px;margin-inline:auto}
+.form{display:flex;flex-direction:column;gap:1rem}
+.field{display:flex;flex-direction:column;gap:.35rem;font-weight:600;font-size:.92rem}
+.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.7rem .85rem;font-weight:400;width:100%;min-width:0}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--red);outline:0;box-shadow:0 0 0 3px var(--glow)}
+.field textarea.codein{font-family:var(--font-code);font-size:.85rem;min-height:240px;direction:ltr;text-align:left;tab-size:2;white-space:pre}
+.field small{font-weight:400;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:600px){.two{grid-template-columns:1fr}}
+.drop{display:flex;align-items:center;gap:1rem;padding:.8rem;border:2px dashed var(--line);border-radius:12px;cursor:pointer}
+.drop:hover{border-color:var(--red)}
+.drop img{width:110px;height:62px;object-fit:cover;border-radius:8px}
+.drop .ph{width:110px;height:62px;border-radius:8px;background:var(--card2);display:grid;place-items:center;color:var(--red)}
+.err{color:var(--red);font-weight:600;min-height:1.2em;margin:0;font-size:.9rem}
+.notice{padding:.9rem 1rem;border-radius:12px;background:var(--card2);border:1px solid var(--red);margin-bottom:1rem}
+.role{display:inline-block;padding:.15rem .7rem;border-radius:999px;background:var(--red);color:var(--red-ink);font-weight:700;font-size:.8rem}
+.role.plain{background:var(--card2);color:var(--muted);border:1px solid var(--line)}
+.avatar-edit{display:flex;align-items:center;gap:1.25rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.row-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+
+/* Admin */
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.tbl{display:flex;flex-direction:column;gap:.6rem;margin-top:1rem}
+.row{display:flex;align-items:center;gap:.7rem;padding:.7rem;border:1px solid var(--line);border-radius:12px;background:var(--bg);flex-wrap:wrap}
+.row .grow{flex:1;min-width:160px;overflow-wrap:anywhere}
+.row input{flex:1;min-width:130px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem}
+.row img.mini{width:64px;height:36px;object-fit:cover;border-radius:6px}
+.inline-form{display:flex;gap:.6rem;flex-wrap:wrap}
+.inline-form input{flex:1;min-width:150px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.7rem .85rem}
+.h3{font-size:1.1rem;font-weight:700;margin:.25rem 0 .5rem}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.7);display:grid;place-items:center;padding:1rem;overflow:auto}
+.modal-card{position:relative;background:var(--bg2);border:2px solid var(--red);border-radius:16px;width:min(720px,100%);max-height:calc(100vh - 2rem);overflow:auto;padding:1.25rem;box-shadow:var(--shadow);animation:pop .18s ease-out}
+.modal-card.sm{width:min(420px,100%)}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.modal-x{position:absolute;top:.6rem;inset-inline-end:.6rem}
+.modal h2{margin:0 2.5rem 1rem 0;font-size:1.5rem}
+[dir="rtl"] .modal h2{margin:0 0 1rem 2.5rem}
+.detail-img{width:100%;max-height:300px;object-fit:cover;border-radius:12px;margin-bottom:1rem}
+.or{display:flex;align-items:center;gap:.8rem;color:var(--muted);margin:1rem 0;font-size:.9rem}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.gmark{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#fff;color:#ea4335;font-weight:800;font-size:.85rem}
+.switch{text-align:center;margin:1rem 0 0;color:var(--muted)}
+
+/* Toasts */
+#toasts{position:fixed;inset-inline:0;bottom:1.25rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:100;pointer-events:none;padding:0 1rem}
+.toast{background:var(--text);color:var(--bg);padding:.7rem 1.1rem;border-radius:10px;font-weight:600;box-shadow:var(--shadow);border-inline-start:5px solid var(--red);animation:pop .2s ease-out;max-width:100%}
+.toast.err{background:var(--red);color:var(--red-ink);border-color:var(--red2)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <button class="icon-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="sidebar"></button>
+  <a href="#/home" class="wm sm" aria-label="Kyle Hub">Kyle Hub</a>
+  <span class="sp"></span>
+  <button class="icon-btn txt" id="langBtn"></button>
+  <button class="icon-btn" id="themeBtn"></button>
+  <span id="userSlot"></span>
+</header>
+
+<div class="backdrop" id="backdrop"></div>
+<aside class="sidebar" id="sidebar" inert>
+  <div class="sb-top">
+    <a href="#/home" class="wm sm">Kyle Hub</a>
+    <button class="icon-btn" id="sbClose" aria-label="Close"></button>
+  </div>
+  <nav class="nav" id="nav"></nav>
+  <a class="discord" id="discordBtn" href="https://discord.gg/9YUzegsNWf" target="_blank" rel="noopener noreferrer"></a>
+</aside>
+
+<main id="view" aria-live="polite"></main>
+
+<footer class="footer" id="footer">
+  <span id="footerText"></span>
+  <div style="margin-top:0.4rem;">
+    <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fkyle67-tuto.github.io&count_bg=%23ff2d3f&title_bg=%231b1b1e&title=Visits&edge_flat=false" alt="Visits" />
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden><div class="modal-card" id="modalCard" role="dialog" aria-modal="true"></div></div>
+<div id="toasts" role="status"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+         createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendEmailVerification
+       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, orderBy, limit, addDoc, deleteDoc
+       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB9Z5Tjc0yWg69GlWdUBTZ9VgUcGrh5mMU",
+  authDomain: "v-scans.firebaseapp.com",
+  projectId: "v-scans",
+  storageBucket: "v-scans.firebasestorage.app",
+  messagingSenderId: "545198752043",
+  appId: "1:545198752043:web:efdc1656b5fd4f354ec56e",
+  measurementId: "G-NDQER8NPM9"
+};
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const googleProvider = new GoogleAuthProvider();
+
+const ADMIN_EMAIL = "anwarbah96@gmail.com";
+const IMGBB_KEY = "bf32151ce65f47f2707753b98cfa9b67";
+const DISCORD_URL = "https://discord.gg/9YUzegsNWf";
+
+/* ============================ i18n ============================ */
+const I18N = {
+  en: {
+    home:"Home", upload:"Upload", categories:"Categories", recent:"Recent", admin:"Admin panel", profile:"Profile",
+    discord:"Join our Discord", signin:"Sign in", signup:"Create account", signout:"Sign out",
+    email:"Email", password:"Password", name:"Display name", google:"Continue with Google", or:"or",
+    no_account:"New here?", have_account:"Already have an account?",
+    tagline:"The ultimate hub for the best Roblox scripts, powerful GUIs, and game utilities.",
+    browse:"Browse scripts", scripts_n:"scripts", cats_n:"categories",
+    search_ph:"Search by title, tag or description", grid:"Grid view", list:"List view",
+    copy:"Copy code", copied:"Code copied to clipboard", copy_fail:"Couldn't copy. Select the code and copy it manually.",
+    view:"View", close:"Close", all:"All", by:"by",
+    empty_title:"Nothing here yet", empty_search:"No scripts match your search. Try a different word.",
+    empty_upload:"Be the first to publish a script.", empty_wait:"New scripts will show up here.",
+    cats_sub:"Pick a category to filter the library.", recent_sub:"The 20 newest scripts.",
+    upload_sub:"Publish a script, UI kit or asset for the community.",
+    title:"Title", category:"Category", description:"Description", tags:"Tags", tags_hint:"Separate with commas, e.g. gui, tween, inventory",
+    thumbnail:"Thumbnail", choose_image:"Choose an image from your device", code:"Code",
+    publish:"Publish", publishing:"Publishing…", published:"Published",
+    select_category:"Select a category", no_cats:"The admin hasn't created any categories yet.",
+    need_login:"Sign in to continue", need_login_text:"You need an account to use this page.",
+    no_perm:"Upload permission required", no_perm_text:"Only members approved by the admin can publish. Ask in our Discord and include the email you signed up with.",
+    verify_email:"Verify your email address first. We sent a link to your inbox. Reload this page after confirming.",
+    save:"Save changes", saved:"Saved", display_name:"Display name", change_photo:"Change photo",
+    role_admin:"Super admin", role_uploader:"Uploader", role_member:"Member",
+    perms:"Permissions", cats_admin:"Categories", listings:"Listings",
+    grant:"Grant permission", revoke:"Revoke", grant_ph:"user@email.com", granted:"Upload permission granted", revoked:"Upload permission revoked",
+    uploaders:"Approved uploaders", users:"Registered users", none_yet:"Nothing yet.",
+    name_en:"Name (English)", name_ar:"Name (Arabic)", add_cat:"Add category", cat_saved:"Category saved", cat_added:"Category added", cat_deleted:"Category deleted",
+    delete:"Delete", confirm_delete:"Delete this permanently?", deleted:"Deleted",
+    author:"Author", date:"Date", loading:"Loading…", admin_only:"Admins only", admin_only_text:"This page is only available to the super admin.",
+    err_generic:"Something went wrong. Please try again.", err_creds:"Wrong email or password.", err_exists:"That email is already registered.",
+    err_weak:"Password must be at least 6 characters.", err_email:"Enter a valid email address.", err_load:"Couldn't load data. Check your Firestore rules.",
+    err_fields:"Fill in the title, category and code.", err_img:"Choose an image file (max 32 MB).", err_upload:"Image upload failed.",
+    welcome:"Welcome to Kyle Hub", footer:"Kyle Hub. Built by the community for Roblox creators.", pick_lang:"العربية"
+  },
+  ar: {
+    home:"الرئيسية", upload:"رفع", categories:"الفئات", recent:"الأحدث", admin:"لوحة الإدارة", profile:"الملف الشخصي",
+    discord:"انضم إلى الديسكورد", signin:"تسجيل الدخول", signup:"إنشاء حساب", signout:"تسجيل الخروج",
+    email:"البريد الإلكتروني", password:"كلمة المرور", name:"الاسم المعروض", google:"المتابعة عبر جوجل", or:"أو",
+    no_account:"جديد هنا؟", have_account:"لديك حساب بالفعل؟",
+    tagline:"المنصة الأولى لأقوى سكربتات روبلوكس، الواجهات الاحترافية، والأدوات المميزة.",
+    browse:"تصفّح السكربتات", scripts_n:"سكربت", cats_n:"فئة",
+    search_ph:"ابحث بالعنوان أو الوسم أو الوصف", grid:"عرض شبكي", list:"عرض قائمة",
+    copy:"نسخ الكود", copied:"تم نسخ الكود", copy_fail:"تعذّر النسخ. حدّد الكود وانسخه يدويًا.",
+    view:"عرض", close:"إغلاق", all:"الكل", by:"بواسطة",
+    empty_title:"لا يوجد شيء هنا بعد", empty_search:"لا توجد نتائج مطابقة لبحثك. جرّب كلمة أخرى.",
+    empty_upload:"كن أول من ينشر سكربتًا.", empty_wait:"ستظهر السكربتات الجديدة هنا.",
+    cats_sub:"اختر فئة لتصفية المكتبة.", recent_sub:"أحدث ٢٠ سكربتًا.",
+    upload_sub:"انشر سكربتًا أو مجموعة واجهات أو أصلًا للمجتمع.",
+    title:"العنوان", category:"الفئة", description:"الوصف", tags:"الوسوم", tags_hint:"افصل بينها بفاصلة، مثل: gui, tween, inventory",
+    thumbnail:"الصورة المصغّرة", choose_image:"اختر صورة من جهازك", code:"الكود",
+    publish:"نشر", publishing:"جارٍ النشر…", published:"تم النشر",
+    select_category:"اختر فئة", no_cats:"لم ينشئ المشرف أي فئات بعد.",
+    need_login:"سجّل الدخول للمتابعة", need_login_text:"تحتاج إلى حساب لاستخدام هذه الصفحة.",
+    no_perm:"مطلوب إذن الرفع", no_perm_text:"يمكن للأعضاء المعتمدين من المشرف فقط النشر. اطلب ذلك في الديسكورد مع ذكر البريد الذي سجّلت به.",
+    verify_email:"فعّل بريدك الإلكتروني أولًا. أرسلنا رابطًا إلى صندوق الوارد. أعد تحميل الصفحة بعد التأكيد.",
+    save:"حفظ التغييرات", saved:"تم الحفظ", display_name:"الاسم المعروض", change_photo:"تغيير الصورة",
+    role_admin:"المشرف العام", role_uploader:"ناشر", role_member:"عضو",
+    perms:"الصلاحيات", cats_admin:"الفئات", listings:"المنشورات",
+    grant:"منح الإذن", revoke:"سحب الإذن", grant_ph:"user@email.com", granted:"تم منح إذن الرفع", revoked:"تم سحب إذن الرفع",
+    uploaders:"الناشرون المعتمدون", users:"المستخدمون المسجّلون", none_yet:"لا يوجد شيء بعد.",
+    name_en:"الاسم (إنجليزي)", name_ar:"الاسم (عربي)", add_cat:"إضافة فئة", cat_saved:"تم حفظ الفئة", cat_added:"تمت إضافة الفئة", cat_deleted:"تم حذف الفئة",
+    delete:"حذف", confirm_delete:"هل تريد الحذف نهائيًا؟", deleted:"تم الحذف",
+    author:"الناشر", date:"التاريخ", loading:"جارٍ التحميل…", admin_only:"للمشرفين فقط", admin_only_text:"هذه الصفحة متاحة للمشرف العام فقط.",
+    err_generic:"حدث خطأ ما. حاول مرة أخرى.", err_creds:"البريد أو كلمة المرور غير صحيحة.", err_exists:"هذا البريد مسجّل مسبقًا.",
+    err_weak:"يجب ألا تقل كلمة المرور عن 6 أحرف.", err_email:"أدخل بريدًا إلكترونيًا صالحًا.", err_load:"تعذّر تحميل البيانات. تحقق من قواعد Firestore.",
+    err_fields:"أدخل العنوان والفئة والكود.", err_img:"اختر ملف صورة (بحد أقصى 32 ميجابايت).", err_upload:"فشل رفع الصورة.",
+    welcome:"مرحبًا بك في Kyle Hub", footer:"Kyle Hub. مجتمع صنّاع روبلوكس.", pick_lang:"English"
+  }
+};
+
+/* ============================ State ============================ */
+const store = {
+  get(k, d){ try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch {} }
+};
+const state = {
+  lang: store.get("kh_lang", "en"), theme: store.get("kh_theme", "dark"), layout: store.get("kh_layout", "grid"),
+  q: "", catFilter: "", user: null, isAdmin: false, canUpload: false,
+  scripts: [], categories: [], loading: true, authReady: false,
+  adminTab: "perms", admin: { uploaders: [], users: [], loaded: false }
+};
+
+/* ============================ Helpers ============================ */
+const $ = (s, r = document) => r.querySelector(s);
+const t = k => I18N[state.lang][k] ?? I18N.en[k] ?? k;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const safeUrl = u => /^https:\/\//i.test(u || "") ? u : "";
+const fmtDate = ts => new Date(ts || Date.now()).toLocaleDateString(state.lang === "ar" ? "ar" : "en-US", { year:"numeric", month:"short", day:"numeric" });
+const routeName = () => (location.hash.replace(/^#\/?/, "") || "home").split(/[/?]/)[0];
+const lc = s => String(s || "").trim().toLowerCase();
+
+const svg = p => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ic = {
+  menu: svg('<path d="M4 6h16M4 12h16M4 18h16"/>'),
+  search: svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+  grid: svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+  list: svg('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'),
+  copy: svg('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
+  sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+  globe: svg('<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>'),
+  user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
+  trash: svg('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'),
+  upload: svg('<path d="M12 16V4M6 10l6-6 6 6M4 20h16"/>'),
+  home: svg('<path d="M3 11 12 3l9 8M5 10v10h14V10"/>'),
+  folder: svg('<path d="M3 6a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
+  clock: svg('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'),
+  shield: svg('<path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/>'),
+  close: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+  code: svg('<path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/>'),
+  image: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>'),
+  discord: `<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>`
+};
+
+function toast(msg, isErr = false){
+  const el = document.createElement("div");
+  el.className = "toast" + (isErr ? " err" : "");
+  el.textContent = msg;
+  $("#toasts").appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+async function copyText(txt){
+  try { await navigator.clipboard.writeText(txt); return true; }
+  catch {
+    const ta = document.createElement("textarea");
+    ta.value = txt; ta.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch {}
+    ta.remove(); return ok;
+  }
+}
+function avatarHTML(url, name, cls = ""){
+  const u = safeUrl(url);
+  if (u) return `<img class="avatar ${cls}" src="${esc(u)}" alt="" referrerpolicy="no-referrer">`;
+  return `<span class="avatar ${cls}" aria-hidden="true">${esc((name || "?").trim().charAt(0).toUpperCase())}</span>`;
+}
+const displayName = u => u?.displayName || (u?.email ? u.email.split("@")[0] : "User");
+const catOf = id => state.categories.find(c => c.id === id);
+const catName = s => { const c = catOf(s.categoryId); return c ? (state.lang === "ar" ? (c.name_ar || c.name_en) : (c.name_en || c.name_ar)) : (s.categoryName || "—"); };
+const catLabel = c => state.lang === "ar" ? (c.name_ar || c.name_en) : (c.name_en || c.name_ar);
+
+/* ---------- ImgBB ---------- */
+async function uploadToImgBB(file){
+  const fd = new FormData();
+  fd.append("image", file);
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || !json.success) throw new Error(json?.error?.message || t("err_upload"));
+  return json.data.display_url || json.data.url;
+}
+const validImage = f => f && f.type.startsWith("image/") && f.size <= 32 * 1024 * 1024;
+
+/* ============================ Data ============================ */
+async function loadCategories(){
+  const snap = await getDocs(query(collection(db, "categories"), orderBy("createdAt", "asc")));
+  state.categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadScripts(){
+  const snap = await getDocs(query(collection(db, "scripts"), orderBy("createdAt", "desc"), limit(200)));
+  state.scripts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function loadAll(){
+  state.loading = true; renderView();
+  try { await Promise.all([loadCategories(), loadScripts()]); }
+  catch (e) { console.error(e); toast(t("err_load"), true); }
+  state.loading = false; renderView();
+}
+async function loadAdmin(){
+  try {
+    const [u, up] = await Promise.all([ getDocs(collection(db, "users")), getDocs(collection(db, "uploaders")) ]);
+    state.admin.users = u.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+    state.admin.uploaders = up.docs.map(d => ({ id: d.id, ...d.data() }));
+    state.admin.loaded = true;
+  } catch (e) { console.error(e); toast(t("err_load"), true); }
+}
+
+/* ============================ Auth ============================ */
+async function resolvePerms(){
+  const u = state.user;
+  state.isAdmin = !!(u && u.emailVerified && lc(u.email) === ADMIN_EMAIL);
+  state.canUpload = state.isAdmin;
+  if (u && u.emailVerified && !state.isAdmin) {
+    try { state.canUpload = (await getDoc(doc(db, "uploaders", lc(u.email)))).exists(); } catch { state.canUpload = false; }
+  }
+}
+onAuthStateChanged(auth, async u => {
+  state.user = u; state.authReady = true;
+  await resolvePerms();
+  if (u) {
+    setDoc(doc(db, "users", u.uid), { email: lc(u.email), displayName: displayName(u), photoURL: u.photoURL || "", lastSeen: Date.now() }, { merge: true }).catch(() => {});
+  }
+  state.admin.loaded = false;
+  renderHeader(); renderSidebar(); renderView();
+});
+
+function authError(e){
+  const c = e?.code || "";
+  if (c.includes("invalid-credential") || c.includes("wrong-password") || c.includes("user-not-found")) return t("err_creds");
+  if (c.includes("email-already-in-use")) return t("err_exists");
+  if (c.includes("weak-password")) return t("err_weak");
+  if (c.includes("invalid-email")) return t("err_email");
+  if (c.includes("popup-closed") || c.includes("cancelled-popup")) return "";
+  return t("err_generic");
+}
+function openAuth(mode = "signin"){
+  const up = mode === "signup";
+  openModal(`
+    <h2>${t(up ? "signup" : "signin")}</h2>
+    <button class="btn block" id="gBtn" type="button"><span class="gmark">G</span>${t("google")}</button>
+    <div class="or"><span>${t("or")}</span></div>
+    <form class="form" id="authForm" novalidate>
+      ${up ? `<label class="field"><span>${t("name")}</span><input id="aName" maxlength="40" autocomplete="nickname" required></label>` : ""}
+      <label class="field"><span>${t("email")}</span><input id="aEmail" type="email" autocomplete="email" required dir="ltr"></label>
+      <label class="field"><span>${t("password")}</span><input id="aPass" type="password" autocomplete="${up ? "new-password" : "current-password"}" minlength="6" required dir="ltr"></label>
+      <p class="err" id="aErr" role="alert"></p>
+      <button class="btn primary block" type="submit" id="aSubmit">${t(up ? "signup" : "signin")}</button>
+    </form>
+    <p class="switch">${t(up ? "have_account" : "no_account")} <button class="link" type="button" id="swMode">${t(up ? "signin" : "signup")}</button></p>`, "sm");
+
+  $("#swMode").onclick = () => openAuth(up ? "signin" : "signup");
+  $("#gBtn").onclick = async () => {
+    try { await signInWithPopup(auth, googleProvider); closeModal(); toast(t("welcome")); }
+    catch (e) { const m = authError(e); if (m) $("#aErr").textContent = m; }
+  };
+  $("#authForm").onsubmit = async ev => {
+    ev.preventDefault();
+    const email = $("#aEmail").value.trim(), pass = $("#aPass").value, btn = $("#aSubmit");
+    $("#aErr").textContent = "";
+    btn.disabled = true;
+    try {
+      if (up) {
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await updateProfile(cred.user, { displayName: $("#aName").value.trim() || email.split("@")[0] });
+        sendEmailVerification(cred.user).catch(() => {});
+        renderHeader();
+      } else {
+        await signInWithEmailAndPassword(auth, email, pass);
+      }
+      closeModal(); toast(t("welcome"));
+    } catch (e) { $("#aErr").textContent = authError(e); }
+    btn.disabled = false;
+  };
+}
+
+/* ============================ Modal ============================ */
+function openModal(html, cls = ""){
+  const card = $("#modalCard");
+  card.className = "modal-card " + cls;
+  card.innerHTML = `<button class="icon-btn modal-x" id="mClose" aria-label="${t("close")}">${ic.close}</button>${html}`;
+  $("#modal").hidden = false;
+  $("#mClose").onclick = closeModal;
+}
+function closeModal(){ $("#modal").hidden = true; $("#modalCard").innerHTML = ""; }
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+
+function openDetail(id){
+  const s = state.scripts.find(x => x.id === id); if (!s) return;
+  const img = safeUrl(s.thumbnail);
+  openModal(`
+    ${img ? `<img class="detail-img" src="${esc(img)}" alt="">` : ""}
+    <h2>${esc(s.title)}</h2>
+    <div class="meta" style="margin-bottom:.8rem"><span class="tag-pill" style="border-color:var(--red)">${esc(catName(s))}</span>
+      <span class="who">${avatarHTML(s.authorPhoto, s.authorName, "sm")}${esc(s.authorName)}</span><span>${fmtDate(s.createdAt)}</span></div>
+    ${s.description ? `<p style="overflow-wrap:anywhere;white-space:pre-line">${esc(s.description)}</p>` : ""}
+    ${(s.tags || []).length ? `<div class="tags" style="margin-bottom:1rem">${s.tags.map(x => `<span class="tag-pill">#${esc(x)}</span>`).join("")}</div>` : ""}
+    <pre class="code full"><code>${esc(s.code)}</code></pre>
+    <div class="row-actions" style="margin-top:1rem">
+      <button class="btn primary" data-copy="${esc(s.id)}">${ic.copy}${t("copy")}</button>
+      ${state.isAdmin ? `<button class="btn danger" data-del="${esc(s.id)}">${ic.trash}${t("delete")}</button>` : ""}
+    </div>`);
+}
+
+/* ============================ Chrome: header, sidebar ============================ */
+function applyPrefs(){
+  const h = document.documentElement;
+  h.lang = state.lang; h.dir = state.lang === "ar" ? "rtl" : "ltr"; h.dataset.theme = state.theme;
+}
+function renderHeader(){
+  $("#menuBtn").innerHTML = ic.menu;
+  $("#menuBtn").setAttribute("aria-label", "Menu");
+  $("#langBtn").innerHTML = `${ic.globe}<span>${t("pick_lang")}</span>`;
+  $("#themeBtn").innerHTML = state.theme === "dark" ? ic.sun : ic.moon;
+  const u = state.user;
+  $("#userSlot").innerHTML = u
+    ? `<a class="icon-btn" href="#/profile" aria-label="${t("profile")}" style="border-radius:50%;overflow:hidden">${avatarHTML(u.photoURL, displayName(u))}</a>`
+    : `<button class="btn primary" id="signinBtn">${t("signin")}</button>`;
+  const sb = $("#signinBtn"); if (sb) sb.onclick = () => openAuth("signin");
+}
+function renderSidebar(){
+  const cur = routeName();
+  const items = [["home", ic.home], ["upload", ic.upload], ["categories", ic.folder], ["recent", ic.clock]];
+  if (state.isAdmin) items.push(["admin", ic.shield]);
+  $("#nav").innerHTML = items.map(([k, i]) => `<a href="#/${k}" class="${cur === k ? "active" : ""}">${i}<span>${t(k)}</span></a>`).join("");
+  $("#discordBtn").innerHTML = `${ic.discord}<span>${t("discord")}</span>`;
+  $("#sbClose").innerHTML = ic.close;
+  const ft = $("#footerText");
+  if (ft) ft.textContent = t("footer");
+  else $("#footer").textContent = t("footer");
+}
+function setSidebar(open){
+  $("#sidebar").classList.toggle("open", open);
+  $("#sidebar").inert = !open;
+  $("#backdrop").classList.toggle("show", open);
+  $("#menuBtn").setAttribute("aria-expanded", String(open));
+}
+$("#menuBtn").onclick = () => setSidebar(!$("#sidebar").classList.contains("open"));
+$("#sbClose").onclick = () => setSidebar(false);
+$("#backdrop").onclick = () => setSidebar(false);
+$("#nav").addEventListener("click", e => { if (e.target.closest("a")) setSidebar(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { setSidebar(false); if (!$("#modal").hidden) closeModal(); } });
+$("#themeBtn").onclick = () => { state.theme = state.theme === "dark" ? "light" : "dark"; store.set("kh_theme", state.theme); applyPrefs(); renderHeader(); };
+$("#langBtn").onclick = () => { state.lang = state.lang === "en" ? "ar" : "en"; store.set("kh_lang", state.lang); renderAll(); };
+
+/* ============================ Script list ============================ */
+function currentList(){
+  const r = routeName(), q = lc(state.q);
+  let l = state.scripts;
+  if (r === "categories" && state.catFilter) l = l.filter(s => s.categoryId === state.catFilter);
+  if (q) l = l.filter(s => lc([s.title, s.description, (s.tags || []).join(" ")].join(" ")).includes(q));
+  if (r === "recent") l = l.slice(0, 20);
+  return l;
+}
+function cardHTML(s){
+  const img = safeUrl(s.thumbnail);
+  const lines = String(s.code || "").split("\n").slice(0, 8).join("\n").slice(0, 500);
+  return `<article class="card">
+    <div class="thumb" data-open="${esc(s.id)}">${img ? `<img loading="lazy" src="${esc(img)}" alt="">` : `<div class="thumb-ph">${ic.code}</div>`}<span class="badge">${esc(catName(s))}</span></div>
+    <div class="card-body">
+      <h3 data-open="${esc(s.id)}">${esc(s.title)}</h3>
+      <div class="meta"><span class="who">${avatarHTML(s.authorPhoto, s.authorName, "sm")}${esc(s.authorName)}</span><span>${fmtDate(s.createdAt)}</span></div>
+      ${s.description ? `<p class="desc">${esc(s.description)}</p>` : ""}
+      ${(s.tags || []).length ? `<div class="tags">${s.tags.slice(0, 5).map(x => `<span class="tag-pill">#${esc(x)}</span>`).join("")}</div>` : ""}
+      <pre class="code prev"><code>${esc(lines)}</code></pre>
+      <div class="card-actions">
+        <button class="btn primary" data-copy="${esc(s.id)}">${ic.copy}${t("copy")}</button>
+        <button class="btn" data-open="${esc(s.id)}">${t("view")}</button>
+        ${state.isAdmin ? `<button class="btn danger icon" data-del="${esc(s.id)}" aria-label="${t("delete")}">${ic.trash}</button>` : ""}
+      </div>
+    </div></article>`;
+}
+function renderResults(){
+  const el = $("#results"); if (!el) return;
+  el.className = "results " + state.layout;
+  if (state.loading) { el.innerHTML = '<div class="skel"></div>'.repeat(3); return; }
+  const l = currentList();
+  if (!l.length) {
+    const searching = !!state.q.trim();
+    el.innerHTML = `<div class="empty">${ic.code}<h3>${t("empty_title")}</h3><p>${searching ? t("empty_search") : (state.canUpload ? t("empty_upload") : t("empty_wait"))}</p></div>`;
+    return;
+  }
+  el.innerHTML = l.map(cardHTML).join("");
+}
+function toolbarHTML(){
+  return `<div class="toolbar">
+    <label class="search">${ic.search}<span class="sr">${t("search_ph")}</span><input id="q" type="search" placeholder="${esc(t("search_ph"))}" value="${esc(state.q)}" autocomplete="off"></label>
+    <div class="seg" role="group">
+      <button data-layout="grid" class="${state.layout === "grid" ? "on" : ""}" aria-label="${t("grid")}" title="${t("grid")}">${ic.grid}</button>
+      <button data-layout="list" class="${state.layout === "list" ? "on" : ""}" aria-label="${t("list")}" title="${t("list")}">${ic.list}</button>
+    </div></div><div id="results" class="results"></div>`;
+}
+function bindToolbar(){
+  $("#q").addEventListener("input", e => { state.q = e.target.value; renderResults(); });
+  document.querySelectorAll("[data-layout]").forEach(b => b.onclick = () => {
+    state.layout = b.dataset.layout; store.set("kh_layout", state.layout);
+    document.querySelectorAll("[data-layout]").forEach(x => x.classList.toggle("on", x === b));
+    renderResults();
+  });
+  renderResults();
+}
+const pageHead = (icon, key, sub) => `<div class="page-h">${icon}<h2>${t(key)}</h2></div><p class="sub">${t(sub)}</p>`;
+const gate = (title, text, extra = "") => `<section class="panel narrow" style="text-align:center"><h2 style="margin-bottom:.6rem">${title}</h2><p class="muted">${text}</p>${extra}</section>`;
+
+/* ============================ Views ============================ */
+function renderView(){
+  const v = $("#view"), r = routeName();
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#/" + r));
+  if (r === "upload") return viewUpload(v);
+  if (r === "profile") return viewProfile(v);
+  if (r === "admin") return viewAdmin(v);
+  if (r === "categories") return viewCategories(v);
+  if (r === "recent") { v.innerHTML = pageHead(ic.clock, "recent", "recent_sub") + toolbarHTML(); return bindToolbar(); }
+  return viewHome(v);
+}
+function viewHome(v){
+  v.innerHTML = `
+    <section class="hero">
+      <h1 class="wm xl">Kyle Hub</h1>
+      <p class="tag">${t("tagline")}</p>
+      <div class="hero-cta">
+        <a class="btn primary lg" href="#/categories">${t("browse")}</a>
+        <a class="btn lg" href="#/upload">${ic.upload}${t("upload")}</a>
+      </div>
+      <div class="stats"><span><b>${state.scripts.length}</b> ${t("scripts_n")}</span><span><b>${state.categories.length}</b> ${t("cats_n")}</span></div>
+    </section>${toolbarHTML()}`;
+  bindToolbar();
+}
+function viewCategories(v){
+  const count = id => state.scripts.filter(s => s.categoryId === id).length;
+  v.innerHTML = pageHead(ic.folder, "categories", "cats_sub") + `
+    <div class="chips" id="chips">
+      <button class="chip ${state.catFilter ? "" : "on"}" data-cat="">${t("all")}<small>${state.scripts.length}</small></button>
+      ${state.categories.map(c => `<button class="chip ${state.catFilter === c.id ? "on" : ""}" data-cat="${esc(c.id)}">${esc(catLabel(c))}<small>${count(c.id)}</small></button>`).join("")}
+    </div>` + toolbarHTML();
+  $("#chips").onclick = e => {
+    const b = e.target.closest("[data-cat]"); if (!b) return;
+    state.catFilter = b.dataset.cat;
+    document.querySelectorAll("#chips .chip").forEach(x => x.classList.toggle("on", x === b));
+    renderResults();
+  };
+  bindToolbar();
+}
+
+/* ---------- Upload ---------- */
+function viewUpload(v){
+  const head = pageHead(ic.upload, "upload", "upload_sub");
+  if (!state.authReady) { v.innerHTML = head; return; }
+  if (!state.user) {
+    v.innerHTML = head + gate(t("need_login"), t("need_login_text"), `<p><button class="btn primary" id="gateLogin">${t("signin")}</button></p>`);
+    $("#gateLogin").onclick = () => openAuth("signin"); return;
+  }
+  if (!state.canUpload) {
+    const unverified = !state.user.emailVerified;
+    v.innerHTML = head + gate(t("no_perm"), unverified ? t("verify_email") : t("no_perm_text"),
+      `<p><a class="btn primary" href="${DISCORD_URL}" target="_blank" rel="noopener noreferrer">${ic.discord.replace('width="26" height="26"', 'width="20" height="20"')}${t("discord")}</a></p>`);
+    return;
+  }
+  v.innerHTML = head + `
+  <form class="panel form" id="upForm" novalidate>
+    <div class="two">
+      <label class="field"><span>${t("title")}</span><input id="uTitle" maxlength="90" required></label>
+      <label class="field"><span>${t("category")}</span>
+        <select id="uCat" required><option value="">${t("select_category")}</option>${state.categories.map(c => `<option value="${esc(c.id)}">${esc(catLabel(c))}</option>`).join("")}</select>
+        ${state.categories.length ? "" : `<small>${t("no_cats")}</small>`}
+      </label>
+    </div>
+    <label class="field"><span>${t("description")}</span><textarea id="uDesc" rows="3" maxlength="600"></textarea></label>
+    <label class="field"><span>${t("tags")}</span><input id="uTags"><small>${t("tags_hint")}</small></label>
+    <div class="field"><span>${t("thumbnail")}</span>
+      <label class="drop"><input type="file" id="uFile" accept="image/*" hidden>
+        <span id="uPrev" class="ph">${ic.image}</span><span class="muted" id="uFileName">${t("choose_image")}</span></label>
+    </div>
+    <label class="field"><span>${t("code")}</span><textarea id="uCode" class="codein" spellcheck="false" required placeholder="local Players = game:GetService(&quot;Players&quot;)"></textarea></label>
+    <p class="err" id="uErr" role="alert"></p>
+    <div><button class="btn primary lg" id="uBtn" type="submit">${ic.upload}${t("publish")}</button></div>
+  </form>`;
+
+  $("#uFile").onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (!validImage(f)) { $("#uErr").textContent = t("err_img"); e.target.value = ""; return; }
+    $("#uErr").textContent = "";
+    $("#uPrev").outerHTML = `<img id="uPrev" src="${URL.createObjectURL(f)}" alt="">`;
+    $("#uFileName").textContent = f.name;
+  };
+  $("#upForm").onsubmit = async ev => {
+    ev.preventDefault();
+    const title = $("#uTitle").value.trim(), catId = $("#uCat").value, code = $("#uCode").value;
+    const err = $("#uErr"), btn = $("#uBtn"); err.textContent = "";
+    if (!title || !catId || !code.trim()) { err.textContent = t("err_fields"); return; }
+    btn.disabled = true; btn.lastChild.textContent = t("publishing");
+    try {
+      const file = $("#uFile").files[0];
+      const thumbnail = file ? await uploadToImgBB(file) : "";
+      const u = state.user, c = catOf(catId);
+      await addDoc(collection(db, "scripts"), {
+        title, description: $("#uDesc").value.trim(), code,
+        tags: $("#uTags").value.split(/[,،]/).map(x => x.trim()).filter(Boolean).slice(0, 8),
+        categoryId: catId, categoryName: c ? (c.name_en || c.name_ar) : "",
+        thumbnail, authorUid: u.uid, authorName: displayName(u), authorPhoto: u.photoURL || "",
+        createdAt: Date.now()
+      });
+      toast(t("published"));
+      await loadScripts();
+      location.hash = "#/recent";
+    } catch (e) { console.error(e); err.textContent = e.message || t("err_generic"); btn.disabled = false; btn.lastChild.textContent = t("publish"); }
+  };
+}
+
+/* ---------- Profile ---------- */
+function viewProfile(v){
+  if (!state.authReady) { v.innerHTML = ""; return; }
+  const u = state.user;
+  if (!u) { v.innerHTML = gate(t("need_login"), t("need_login_text"), `<p><button class="btn primary" id="gateLogin">${t("signin")}</button></p>`); $("#gateLogin").onclick = () => openAuth("signin"); return; }
+  const role = state.isAdmin ? ["role_admin", ""] : state.canUpload ? ["role_uploader", ""] : ["role_member", "plain"];
+  v.innerHTML = pageHead(ic.user, "profile", "welcome").replace(`<p class="sub">${t("welcome")}</p>`, "") + `
+  <section class="panel narrow form">
+    <div class="avatar-edit">
+      <div id="pAv">${avatarHTML(u.photoURL, displayName(u), "xl")}</div>
+      <label class="btn"><input type="file" id="pFile" accept="image/*" hidden>${ic.image}${t("change_photo")}</label>
+    </div>
+    <label class="field"><span>${t("display_name")}</span><input id="pName" maxlength="40" value="${esc(displayName(u))}"></label>
+    <div class="meta"><span dir="ltr">${esc(u.email)}</span><span class="role ${role[1]}">${t(role[0])}</span></div>
+    <p class="err" id="pErr" role="alert"></p>
+    <div class="row-actions"><button class="btn primary" id="pSave">${t("save")}</button><button class="btn ghost" id="pOut">${t("signout")}</button></div>
+  </section>`;
+  let file = null;
+  $("#pFile").onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    if (!validImage(f)) { $("#pErr").textContent = t("err_img"); e.target.value = ""; return; }
+    $("#pErr").textContent = ""; file = f;
+    $("#pAv").innerHTML = `<img class="avatar xl" src="${URL.createObjectURL(f)}" alt="">`;
+  };
+  $("#pSave").onclick = async () => {
+    const btn = $("#pSave"), name = $("#pName").value.trim() || displayName(u);
+    btn.disabled = true; $("#pErr").textContent = "";
+    try {
+      const photoURL = file ? await uploadToImgBB(file) : (u.photoURL || "");
+      await updateProfile(auth.currentUser, { displayName: name, photoURL });
+      await setDoc(doc(db, "users", u.uid), { email: lc(u.email), displayName: name, photoURL, lastSeen: Date.now() }, { merge: true });
+      file = null; renderHeader(); toast(t("saved"));
+    } catch (e) { console.error(e); $("#pErr").textContent = e.message || t("err_generic"); }
+    btn.disabled = false;
+  };
+  $("#pOut").onclick = async () => { await signOut(auth); location.hash = "#/home"; };
+}
+
+/* ---------- Admin ---------- */
+async function viewAdmin(v){
+  const head = pageHead(ic.shield, "admin", "welcome").replace(`<p class="sub">${t("welcome")}</p>`, "");
+  if (!state.authReady) { v.innerHTML = head; return; }
+  if (!state.isAdmin) { v.innerHTML = head + gate(t("admin_only"), t("admin_only_text")); return; }
+  v.innerHTML = head + `
+    <div class="tabs" id="aTabs">${[["perms", "perms"], ["cats", "cats_admin"], ["list", "listings"]].map(([k, l]) => `<button class="chip ${state.adminTab === k ? "on" : ""}" data-tab="${k}">${t(l)}</button>`).join("")}</div>
+    <section class="panel" id="aBody">${t("loading")}</section>`;
+  $("#aTabs").onclick = e => { const b = e.target.closest("[data-tab]"); if (!b) return; state.adminTab = b.dataset.tab; viewAdmin(v); };
+  if (!state.admin.loaded) await loadAdmin();
+  if (routeName() !== "admin") return;
+  adminBody();
+}
+function adminBody(){
+  const el = $("#aBody"); if (!el) return;
+  const tab = state.adminTab;
+  if (tab === "perms") {
+    const granted = new Set(state.admin.uploaders.map(x => x.id));
+    el.innerHTML = `
+      <form class="inline-form" id="grantForm"><input id="gEmail" type="email" dir="ltr" required placeholder="${t("grant_ph")}" aria-label="${t("email")}"><button class="btn primary" type="submit">${t("grant")}</button></form>
+      <div class="tbl"><div class="h3">${t("uploaders")}</div>
+        ${state.admin.uploaders.length ? state.admin.uploaders.map(x => `<div class="row"><span class="grow" dir="ltr">${esc(x.email || x.id)}</span><button class="btn danger sm" data-revoke="${esc(x.id)}">${t("revoke")}</button></div>`).join("") : `<p class="muted">${t("none_yet")}</p>`}
+      </div>
+      <div class="tbl"><div class="h3">${t("users")}</div>
+        ${state.admin.users.length ? state.admin.users.map(u => {
+          const ok = granted.has(lc(u.email));
+          return `<div class="row">${avatarHTML(u.photoURL, u.displayName, "sm")}<span class="grow"><b>${esc(u.displayName)}</b><br><span class="muted" dir="ltr">${esc(u.email)}</span></span>${lc(u.email) === ADMIN_EMAIL ? `<span class="role">${t("role_admin")}</span>` : ok ? `<button class="btn danger sm" data-revoke="${esc(lc(u.email))}">${t("revoke")}</button>` : `<button class="btn sm" data-grant="${esc(lc(u.email))}">${t("grant")}</button>`}</div>`;
+        }).join("") : `<p class="muted">${t("none_yet")}</p>`}
+      </div>`;
+    $("#grantForm").onsubmit = ev => { ev.preventDefault(); grantUpload($("#gEmail").value); };
+  } else if (tab === "cats") {
+    el.innerHTML = `
+      <form class="inline-form" id="catForm">
+        <input id="cEn" placeholder="${t("name_en")}" aria-label="${t("name_en")}" maxlength="40" required>
+        <input id="cAr" dir="rtl" placeholder="${t("name_ar")}" aria-label="${t("name_ar")}" maxlength="40">
+        <button class="btn primary" type="submit">${t("add_cat")}</button></form>
+      <div class="tbl">${state.categories.length ? state.categories.map(c => `
+        <div class="row" data-cat-row="${esc(c.id)}"><input data-f="en" value="${esc(c.name_en)}" aria-label="${t("name_en")}"><input data-f="ar" dir="rtl" value="${esc(c.name_ar)}" aria-label="${t("name_ar")}">
+          <button class="btn sm" data-save-cat="${esc(c.id)}">${t("save")}</button><button class="btn danger sm" data-del-cat="${esc(c.id)}">${ic.trash}</button></div>`).join("") : `<p class="muted">${t("none_yet")}</p>`}</div>`;
+    $("#catForm").onsubmit = async ev => {
+      ev.preventDefault();
+      const en = $("#cEn").value.trim(), ar = $("#cAr").value.trim();
+      if (!en && !ar) return;
+      try { await addDoc(collection(db, "categories"), { name_en: en || ar, name_ar: ar || en, createdAt: Date.now() }); await loadCategories(); toast(t("cat_added")); adminBody(); }
+      catch (e) { console.error(e); toast(t("err_generic"), true); }
+    };
+  } else {
+    el.innerHTML = `<div class="tbl" style="margin-top:0">${state.scripts.length ? state.scripts.map(s => {
+      const img = safeUrl(s.thumbnail);
+      return `<div class="row">${img ? `<img class="mini" src="${esc(img)}" alt="">` : ""}<span class="grow"><b>${esc(s.title)}</b><br><span class="muted">${esc(s.authorName)} · ${fmtDate(s.createdAt)} ·${esc(catName(s))}</span></span>
+        <button class="btn sm" data-open="${esc(s.id)}">${t("view")}</button><button class="btn danger sm" data-del="${esc(s.id)}">${ic.trash}</button></div>`;
+    }).join("") : `<p class="muted">${t("none_yet")}</p>`}</div>`;
+  }
+}
+async function grantUpload(emailRaw){
+  const email = lc(emailRaw);
+  if (!/^\S+@\S+\.\S+$/.test(email)) return toast(t("err_email"), true);
+  try {
+    await setDoc(doc(db, "uploaders", email), { email, grantedAt: Date.now(), grantedBy: lc(state.user.email) });
+    await loadAdmin(); toast(t("granted")); adminBody();
+  } catch (e) { console.error(e); toast(t("err_generic"), true); }
+}
+async function revokeUpload(email){
+  try { await deleteDoc(doc(db, "uploaders", email)); await loadAdmin(); toast(t("revoked")); adminBody(); }
+  catch (e) { console.error(e); toast(t("err_generic"), true); }
+}
+async function deleteScript(id){
+  if (!confirm(t("confirm_delete"))) return;
+  try {
+    await deleteDoc(doc(db, "scripts", id));
+    state.scripts = state.scripts.filter(s => s.id !== id);
+    if (!$("#modal").hidden) closeModal();
+    toast(t("deleted"));
+    routeName() === "admin" ? adminBody() : renderResults();
+  } catch (e) { console.error(e); toast(t("err_generic"), true); }
+}
+
+/* ============================ Global click handling ============================ */
+document.addEventListener("click", async e => {
+  const el = e.target.closest("[data-copy],[data-open],[data-del],[data-revoke],[data-grant],[data-save-cat],[data-del-cat]");
+  if (!el) return;
+  const d = el.dataset;
+  if (d.copy) {
+    const s = state.scripts.find(x => x.id === d.copy);
+    if (s) (await copyText(s.code)) ? toast(t("copied")) : toast(t("copy_fail"), true);
+  }
+  else if (d.open) openDetail(d.open);
+  else if (d.del) deleteScript(d.del);
+  else if (d.revoke) revokeUpload(d.revoke);
+  else if (d.grant) grantUpload(d.grant);
+  else if (d.saveCat) {
+    const row = el.closest("[data-cat-row]");
+    const en = $('[data-f="en"]', row).value.trim(), ar = $('[data-f="ar"]', row).value.trim();
+    if (!en && !ar) return;
+    try { await updateDoc(doc(db, "categories", d.saveCat), { name_en: en || ar, name_ar: ar || en }); await loadCategories(); toast(t("cat_saved")); }
+    catch (err) { console.error(err); toast(t("err_generic"), true); }
+  }
+  else if (d.delCat) {
+    if (!confirm(t("confirm_delete"))) return;
+    try { await deleteDoc(doc(db, "categories", d.delCat)); await loadCategories(); if (state.catFilter === d.delCat) state.catFilter = ""; toast(t("cat_deleted")); adminBody(); }
+    catch (err) { console.error(err); toast(t("err_generic"), true); }
+  }
+});
+
+/* ============================ Boot ============================ */
+function renderAll(){ applyPrefs(); renderHeader(); renderSidebar(); renderView(); }
+window.addEventListener("hashchange", () => { renderView(); window.scrollTo({ top: 0 }); });
+renderAll();
+loadAll();
+</script>
+</body>
+</html>
