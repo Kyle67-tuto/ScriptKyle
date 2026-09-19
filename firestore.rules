@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn()  { return request.auth != null; }
+    function verified()  { return signedIn() && request.auth.token.email_verified == true; }
+    function myEmail()   { return request.auth.token.email.lower(); }
+    function isAdmin()   { return verified() && myEmail() == 'anwarbah96@gmail.com'; }
+    function canUpload() {
+      return isAdmin() ||
+        (verified() && exists(/databases/$(database)/documents/uploaders/$(myEmail())));
+    }
+
+    // Public library
+    match /scripts/{id} {
+      allow read: if true;
+      allow create: if canUpload()
+                    && request.resource.data.authorUid == request.auth.uid
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() <= 90
+                    && request.resource.data.code is string
+                    && request.resource.data.code.size() <= 200000;
+      allow delete: if isAdmin() || (signedIn() && resource.data.authorUid == request.auth.uid);
+      allow update: if isAdmin();
+    }
+
+    // Admin-managed categories
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Upload permission list (document ID = lowercase email)
+    match /uploaders/{email} {
+      allow read: if isAdmin() || (signedIn() && myEmail() == email);
+      allow write: if isAdmin();
+    }
+
+    // Profiles
+    match /users/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+  }
+}
